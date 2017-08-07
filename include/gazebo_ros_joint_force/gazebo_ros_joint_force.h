@@ -3,6 +3,7 @@
 # include <unistd.h>
 
 # include <ros/ros.h>
+# include <ros/callback_queue.h>
 # include <sensor_msgs/JointState.h>
 
 # include <gazebo/gazebo.hh>
@@ -21,7 +22,9 @@ protected:
 	virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 
 private:
+	bool loadJoints();
 	void onWorldUpdate();
+	void onRosMsg(const sensor_msgs::JointStateConstPtr& msg);
 
 private:
 	physics::ModelPtr model_;
@@ -29,7 +32,10 @@ private:
 	event::ConnectionPtr update_connection_;
 	std::unique_ptr<ros::NodeHandle> rosNode_; //TODO unique_ptr required
 	ros::Subscriber rosSubscriber_;
+	ros::CallbackQueue rosQueue_;
 
+	std::vector<physics::JointPtr> joints_;
+	std::vector<double> forces_;
 };
 
 }  // namespace gazebo
