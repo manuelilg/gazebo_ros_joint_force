@@ -34,6 +34,9 @@ private:
 	ros::Subscriber rosSubscriber_;
 	ros::CallbackQueue rosQueue_;
 
+	std::string topicName_;
+	std::string robotNamespace_;
+
 	std::vector<physics::JointPtr> joints_;
 	std::vector<double> forces_;
 };
