@@ -22,7 +22,6 @@ protected:
 	virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 
 private:
-	bool loadJoints();
 	void onWorldUpdate();
 	void onRosMsg(const sensor_msgs::JointStateConstPtr& msg);
 
