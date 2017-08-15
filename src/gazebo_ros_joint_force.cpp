@@ -17,7 +17,6 @@ GazeboRosJointForce::~GazeboRosJointForce() {
 
 void GazeboRosJointForce::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
 	this->model_ = _model;
-//	this->sdf_ = _sdf;
 
 	this->robot_namespace_ = this->model_->GetName() + "/";
 	if (!_sdf->HasElement("robotNamespace")) {
@@ -40,8 +39,10 @@ void GazeboRosJointForce::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
 
 	for (auto jn : joint_names_) {
 		this->joints_.push_back(model_->GetJoint(jn));
+		this->forces_.push_back(0.0);
 		ROS_INFO_NAMED("joint_force", "GazeboRosJointForce Plugin is going to set Force on joint: \"%s\"", jn.c_str());
 	}
+
 
 	this->update_connection_ = event::Events::ConnectWorldUpdateBegin(boost::bind(&GazeboRosJointForce::onWorldUpdate, this));
 
@@ -64,34 +65,48 @@ void GazeboRosJointForce::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
 	ROS_INFO_NAMED("joint_force", "GazeboRosJointForce plugin successfully loaded");
 }
 
+
 void GazeboRosJointForce::onWorldUpdate() {
-	while (ros_queue_.isEmpty()) {
-		usleep(1);
-	}
+	waitForMsg();
 
 	if (ros_queue_.callOne() != ros::CallbackQueue::CallOneResult::Called) {
-		ROS_ERROR("Error in gazebo_ros_motor plugin callback not successful called");
+		ROS_ERROR_NAMED("joint_force", "Error in GazeboRosJointForce plugin callback not successful called");
 	}
 
-	if (joints_.size() == forces_.size()) {
-		int i = 0;
-		for (auto j : joints_) {
-			j->SetForce(0, forces_[i++]);
-		}
-		forces_.clear(); //TODO costs
-
-	} else {
-		//TODO ROSERROR
+	unsigned int i = 0;
+	for (auto joint : this->joints_) {
+		joint->SetForce(0, this->forces_[i++]);
 	}
 }
 
-void GazeboRosJointForce::onRosMsg(const sensor_msgs::JointStateConstPtr& msg) {
-//	ROS_INFO("onRosMsg called");
 
-	for (auto f : msg->effort) {
-		forces_.push_back(f);
+void GazeboRosJointForce::onRosMsg(const sensor_msgs::JointStateConstPtr& _msg) {
+	if(!_msg->name.empty()) {
+		for (auto jointName : _msg->name) {
+			auto it = std::find(this->joint_names_.begin(), this->joint_names_.end(), jointName);
+
+			if(it != this->joint_names_.end()) {
+				auto pos = std::distance(this->joint_names_.begin(), it);
+				this->forces_.at(pos);
+			} else {
+				ROS_ERROR_NAMED("joint_force", "joint: \"%s\" not found, add joint to plugin settings <jointName>", jointName.c_str());
+			}
+		}
+
+	} else {
+		unsigned int i = 0;
+		for(auto f : _msg->effort) {
+			this->forces_.at(i) = f;
+			i++;
+		}
 	}
-//	forces_.push_back(msg->effort[0]); // or checked access at(0)
+}
+
+
+void GazeboRosJointForce::waitForMsg() {
+	while (this->ros_queue_.isEmpty()) {
+		usleep(1);
+	}
 }
 
 }  // namespace gazebo
