@@ -1,15 +1,16 @@
-# pragma once
+#pragma once
 
-# include <unistd.h>
+#include <unistd.h>
 
-# include <ros/ros.h>
-# include <ros/callback_queue.h>
-# include <sensor_msgs/JointState.h>
+#include <ros/ros.h>
+#include <ros/callback_queue.h>
+#include <sensor_msgs/JointState.h>
 
-# include <gazebo/gazebo.hh>
-# include <gazebo/physics/physics.hh>
+#include <gazebo/gazebo.hh>
+#include <gazebo/physics/physics.hh>
 
-# include <boost/bind.hpp>
+#include <boost/bind.hpp>
+#include <boost/algorithm/string.hpp>
 
 namespace gazebo {
 
@@ -27,14 +28,15 @@ private:
 
 private:
 	physics::ModelPtr model_;
-	sdf::ElementPtr sdf_;
+//	sdf::ElementPtr sdf_;
 	event::ConnectionPtr update_connection_;
-	std::unique_ptr<ros::NodeHandle> rosNode_; //TODO unique_ptr required
-	ros::Subscriber rosSubscriber_;
-	ros::CallbackQueue rosQueue_;
+	std::unique_ptr<ros::NodeHandle> ros_node_; //TODO unique_ptr required
+	ros::Subscriber ros_subscriber_;
+	ros::CallbackQueue ros_queue_;
 
-	std::string topicName_;
-	std::string robotNamespace_;
+	std::string topic_name_;
+	std::string robot_namespace_;
+	std::vector<std::string> joint_names_;
 
 	std::vector<physics::JointPtr> joints_;
 	std::vector<double> forces_;
