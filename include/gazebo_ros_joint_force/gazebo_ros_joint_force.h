@@ -21,6 +21,7 @@
 // <gazebo>
 // 	 <plugin name="joint_force" filename="libgazebo_ros_joint_force.so">
 // 	 	 <robotNamespace>/eeduro_delta_sim</robotNamespace>
+//		 <topicName>effort</topicName>
 // 	 	 <jointName>arm1_motor_joint, arm2_motor_joint, arm3_motor_joint</jointName>
 // 	 </plugin>
 // </gazebo>

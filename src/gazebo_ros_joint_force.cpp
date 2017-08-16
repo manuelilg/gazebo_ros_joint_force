@@ -28,6 +28,12 @@ void GazeboRosJointForce::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
 		}
 	}
 
+	if (!_sdf->HasElement("topicName")) {
+		ROS_ASSERT("GazeboRosJointForce Plugin missing <topicName>");
+	} else {
+		this->topic_name_ = _sdf->GetElement("topicName")->Get<std::string>();
+	}
+
 	if (!_sdf->HasElement("jointName")) {
 		ROS_ASSERT("GazeboRosJointForce Plugin missing <jointName>");
 	} else {
@@ -67,7 +73,9 @@ void GazeboRosJointForce::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
 
 
 void GazeboRosJointForce::onWorldUpdate() {
+	ROS_INFO("GazeboRosJointForce onWorldUpdate called !!!!!!!!!!!!!!!!!!!!");
 	waitForMsg();
+	ROS_INFO("GazeboRosJointForce end of wait !!!!!!!!!!!!!!!!!!!!");
 
 	if (ros_queue_.callOne() != ros::CallbackQueue::CallOneResult::Called) {
 		ROS_ERROR_NAMED("joint_force", "Error in GazeboRosJointForce plugin callback not successful called");
@@ -81,6 +89,7 @@ void GazeboRosJointForce::onWorldUpdate() {
 
 
 void GazeboRosJointForce::onRosMsg(const sensor_msgs::JointStateConstPtr& _msg) {
+	ROS_INFO("GazeboRosJointForce onRosMsg called !!!!!!!!!!!!!!!!!!!!");
 	if(!_msg->name.empty()) {
 		for (auto jointName : _msg->name) {
 			auto it = std::find(this->joint_names_.begin(), this->joint_names_.end(), jointName);
@@ -106,6 +115,7 @@ void GazeboRosJointForce::onRosMsg(const sensor_msgs::JointStateConstPtr& _msg) 
 void GazeboRosJointForce::waitForMsg() {
 	while (this->ros_queue_.isEmpty()) {
 		usleep(1);
+		ROS_INFO("GazeboRosJointForce waits for msg");
 	}
 }
 
