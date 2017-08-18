@@ -89,7 +89,7 @@ void GazeboRosJointForce::onWorldUpdate() {
 
 
 void GazeboRosJointForce::onRosMsg(const sensor_msgs::JointStateConstPtr& _msg) {
-	ROS_INFO("GazeboRosJointForce onRosMsg called !!!!!!!!!!!!!!!!!!!!");
+//	ROS_INFO("GazeboRosJointForce onRosMsg called !!!!!!!!!!!!!!!!!!!!");
 	if(!_msg->name.empty()) {
 		for (auto jointName : _msg->name) {
 			auto it = std::find(this->joint_names_.begin(), this->joint_names_.end(), jointName);
@@ -115,7 +115,7 @@ void GazeboRosJointForce::onRosMsg(const sensor_msgs::JointStateConstPtr& _msg) 
 void GazeboRosJointForce::waitForMsg() {
 	while (this->ros_queue_.isEmpty()) {
 		usleep(1);
-		ROS_INFO("GazeboRosJointForce waits for msg");
+//		ROS_INFO("GazeboRosJointForce waits for msg");
 	}
 }
 
